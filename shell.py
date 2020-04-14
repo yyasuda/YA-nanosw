@@ -2408,8 +2408,8 @@ def PacketIn():
             print(".", end="", flush=True)
             rep = client.get_stream_packet("packet", timeout=1)
             if rep is not None:
-                print("\nResponse message is:")
-                print(rep)
+                # print("\nResponse message is:")
+                # print(rep)
                 packetin_process(rep)
                 # return rep # if you want to check the response, just return 
     except KeyboardInterrupt:
