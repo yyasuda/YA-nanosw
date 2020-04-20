@@ -1,6 +1,6 @@
-# 1 "nanosw05.p4"
+# 1 "/tmp/nanosw05.p4"
 # 1 "<built-in>" 1
-# 1 "nanosw05.p4" 2
+# 1 "/tmp/nanosw05.p4" 2
 # 1 "/usr/local/share/p4c/p4include/core.p4" 1
 /*
 Copyright 2013-present Barefoot Networks, Inc.
@@ -83,7 +83,7 @@ match_kind {
     /// Longest-prefix match.
     lpm
 }
-# 2 "nanosw05.p4" 2
+# 2 "/tmp/nanosw05.p4" 2
 # 1 "/usr/local/share/p4c/p4include/v1model.p4" 1
 /*
 Copyright 2013-present Barefoot Networks, Inc.
@@ -790,7 +790,7 @@ package V1Switch<H, M>(Parser<H, M> p,
                        ComputeChecksum<H, M> ck,
                        Deparser<H> dep
                        );
-# 3 "nanosw05.p4" 2
+# 3 "/tmp/nanosw05.p4" 2
 
 
 /*
@@ -889,6 +889,7 @@ control MyIngress(inout headers hdr, inout metadata meta,
 {
     action forward(egressSpec_t port) {
         standard_metadata.egress_spec = port;
+        meta.ingress_port = standard_metadata.ingress_port; // exception port
     }
 
     action to_controller() {
@@ -930,10 +931,10 @@ control MyIngress(inout headers hdr, inout metadata meta,
     }
 
     apply {
-        if (standard_metadata.ingress_port == 255) { // this time, it does not happen
+        if (standard_metadata.ingress_port == 255) { // must Packet-Out
             if (hdr.packet_out.mcast_grp == 0) { // packet out to specified port
                 standard_metadata.egress_spec = hdr.packet_out.egress_port;
-            } else { // broadcast to all port, or flood except specified port
+            } else { // broadcast to all port, but except specified port
                 standard_metadata.mcast_grp = hdr.packet_out.mcast_grp; // set multicast flag
                 meta.ingress_port = hdr.packet_out.egress_port; // store exception port
             }

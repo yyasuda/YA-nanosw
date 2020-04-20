@@ -2393,7 +2393,7 @@ def packetin_process(pin):
     else:
         insertSrcTable(srcMac)
         insertDstTable(srcMac, port)
-        PacketOut(port, FLOOD_GRP, payload)
+    PacketOut(port, FLOOD_GRP, payload)
     
 def PacketIn():
     """
@@ -2432,9 +2432,31 @@ def PacketOut(port, mcast_grp, payload):
     metadata.value = mcast_grp
     packet.metadata.append(metadata)
 
-    # print("Packet Out")
-    # print(req)
+    print("Packet Out")
+    print(req)
     client.stream_out_q.put(req)
+
+def _showTable(table):
+    print("=== " + table)
+    te = TableEntry(table)                                                                            
+    for x in te.read():   
+        mk = x.match  
+        od = mk._mk  
+        for k, v in od.items():  
+            key = k # MyIngress.l2_src_table 
+            value = v # MAC address 
+        ac = x.action 
+        an = ac.action_name # MyIngress.nop 
+        ap = ac.msg().params 
+        if len(ap) == 0: 
+            pm = "" 
+        else: 
+            pm = ap[0].value 
+        print(value.exact.value, an, pm)
+
+def ShowTable():
+    _showTable("MyIngress.l2_src_table")
+    _showTable("MyIngress.l2_dst_table")
 
 def Test():
     print(context.get_obj_id(P4Type.controller_packet_metadata, "packet_in"))
@@ -2631,6 +2653,7 @@ def main():
         "PacketOut": PacketOut,
         "client": client,
         "context": context,
+        "ShowTable": ShowTable,
         "Test": Test,
         "Replica": Replica,
         "MulticastGroupEntry": MulticastGroupEntry,

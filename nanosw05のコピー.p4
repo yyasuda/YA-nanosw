@@ -98,7 +98,6 @@ control MyIngress(inout headers hdr, inout metadata meta,
 {
     action forward(egressSpec_t port) {
         standard_metadata.egress_spec = port;
-        meta.ingress_port = standard_metadata.ingress_port; // exception port
     }
 
     action to_controller() {
@@ -140,10 +139,10 @@ control MyIngress(inout headers hdr, inout metadata meta,
     }
 
     apply {
-        if (standard_metadata.ingress_port == CPU_PORT) { // must Packet-Out
+        if (standard_metadata.ingress_port == CPU_PORT) { // this time, it does not happen
             if (hdr.packet_out.mcast_grp == 0) { // packet out to specified port
                 standard_metadata.egress_spec = hdr.packet_out.egress_port;
-            } else { // broadcast to all port, but except specified port
+            } else { // broadcast to all port, or flood except specified port
                 standard_metadata.mcast_grp = hdr.packet_out.mcast_grp; // set multicast flag
                 meta.ingress_port = hdr.packet_out.egress_port; // store exception port
             }
